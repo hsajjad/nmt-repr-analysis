@@ -87,7 +87,8 @@ cmd:option('-cl_skip_root', true, 'Whether to skip the root (head index 0)')
 cmd:option('-cl_linear_classifier', false, 'Whether to use a linear classifier')
 -- debug
 cmd:option('-cl_verbose', false, 'Print a lot of information')
-
+-- training of model is done using bpe
+cmd:option('-cl_bpe', false, 'Whether model is trained with BPE sub-word units or not')
 
 function copy(orig)
   local orig_type = type(orig)

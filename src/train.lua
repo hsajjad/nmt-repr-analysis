@@ -472,6 +472,48 @@ function train(train_data, epoch)
           end
         end
         
+        if classifier_opt.bpe then
+          
+          new_classifier_input_all = torch.zeros(1, #batch_labels[j], context_proto:size(3))
+          if opt.gpuid >= 0 then new_classifier_input_all = new_classifier_input_all:cuda() end
+          
+          local new_word = ""
+          local new_embed = torch.zeros(context_proto:size(3))
+          if opt.gpuid >= 0 then new_embed = new_embed:cuda() end
+          local count = 0
+          local total_words = 1
+
+          for subword_idx = 1, source_l do
+            print ('SUBWORD', subword_idx)
+            local curr_subword = idx2word_src[source[{subword_idx}]] -- convert idx to string
+            print ('CURR', curr_subword)
+
+            new_word = new_word .. curr_subword
+            count = count + 1
+            
+            new_embed = new_embed:add(context[{{1}, {subword_idx}, {}}])
+
+            if (curr_subword:sub(#curr_subword-1, #curr_subword)) ~= "@@" then
+              
+              print (new_word)
+              print (count)
+              new_classifier_input_all[{{1},{total_words},{}}] = new_embed/count
+              new_word = ""
+              count = 0
+              new_embed:zero()
+              total_words = total_words + 1
+
+            end
+
+          end
+
+          print (total_words-1)
+          print (#batch_labels[j])
+          assert(#batch_labels[j] == total_words-1)
+        end
+        -- label size equal to source_words
+
+        classifier_input_all = new_classifier_input_all
         if classifier_opt.verbose then 
           print('classifier_input_all:'); print(classifier_input_all);
           print('batch_labels[j]:'); print(batch_labels[j])
@@ -526,6 +568,7 @@ function train(train_data, epoch)
             if not classifier_opt.deprel or batch_heads[j][t] > 0 then
             
               local classifier_out = classifier:forward(classifier_input)
+              print(batch_labels[j][t])
               loss = loss + criterion:forward(classifier_out, batch_labels[j][t])
               num_words = num_words + 1
               local output_grad = criterion:backward(classifier_out, batch_labels[j][t])
