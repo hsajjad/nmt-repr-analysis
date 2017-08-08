@@ -970,14 +970,17 @@ function load_source_data(file, label_file, label2idx, max_sent_len)
       source, _ = beam.sent2wordidx(line, word2idx_src, model_opt.start_symbol)
     else
       source, _ = beam.sent2charidx(line, char2idx, model_opt.max_word_l, model_opt.start_symbol)
-    end   
-    for i=1,source:size(1)  -- if UNK exists in source, ignore that sentence
-    do
-	if source[i] == UNK then
-		print ('UNKNOWN IN SOURCE' .. source[i])
-		unk_flag = 1
-	end
     end 
+    if classifier_opt.bpe then  
+    	for i=1,source:size(1)  -- if UNK exists in source, ignore that sentence
+    	do
+		if source[i] == UNK then
+			print ('UNKNOWN IN SOURCE' .. source[i])
+			unk_flag = 1
+		end
+    	end
+    end
+ 
     local label_idx = {}
     for label in labels:gmatch'([^%s]+)' do
       if label2idx[label] then
