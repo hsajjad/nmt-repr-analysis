@@ -963,13 +963,21 @@ function load_source_data(file, label_file, label2idx, max_sent_len)
   local max_sent_len = max_sent_len or math.huge
   local data = {}
   for line, labels in seq.zip(io.lines(file), io.lines(label_file)) do
+    local unk_flag = 0
     sent = beam.clean_sent(line)
     local source
     if model_opt.use_chars_enc == 0 then
       source, _ = beam.sent2wordidx(line, word2idx_src, model_opt.start_symbol)
     else
       source, _ = beam.sent2charidx(line, char2idx, model_opt.max_word_l, model_opt.start_symbol)
-    end    
+    end   
+    for i=1,source:size(1)  -- if UNK exists in source, ignore that sentence
+    do
+	if source[i] == UNK then
+		print ('UNKNOWN IN SOURCE' .. source[i])
+		unk_flag = 1
+	end
+    end 
     local label_idx = {}
     for label in labels:gmatch'([^%s]+)' do
       if label2idx[label] then
@@ -982,7 +990,7 @@ function load_source_data(file, label_file, label2idx, max_sent_len)
       end
       table.insert(label_idx, idx)
     end
-    if #label_idx <= max_sent_len then
+    if #label_idx <= max_sent_len and unk_flag == 0 then
       table.insert(data, {source, label_idx})
     end
   end
