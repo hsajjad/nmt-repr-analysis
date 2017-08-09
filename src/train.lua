@@ -514,6 +514,7 @@ function train(train_data, epoch)
         -- label size equal to source_words
 
         classifier_input_all = new_classifier_input_all
+
         if classifier_opt.verbose then 
           print('classifier_input_all:'); print(classifier_input_all);
           print('batch_labels[j]:'); print(batch_labels[j])
@@ -831,6 +832,54 @@ function eval(data, epoch, logger, test_or_val, pred_filename)
       end
     end
     
+    if classifier_opt.bpe then
+          
+      new_classifier_input_all = torch.zeros(1, #labels, context_proto:size(3))
+      if opt.gpuid >= 0 then new_classifier_input_all = new_classifier_input_all:cuda() 
+      end
+          
+        local new_word = ""
+        local new_embed = torch.zeros(context_proto:size(3))
+        if opt.gpuid >= 0 then new_embed = new_embed:cuda() 
+        end
+        
+        local count = 0
+        local total_words = 1
+
+        for subword_idx = 1, source_l do
+          print ('SUBWORD', subword_idx)
+          local curr_subword = idx2word_src[source[{subword_idx}]] -- convert idx to string
+          print ('CURR', curr_subword)
+
+          new_word = new_word .. curr_subword
+          count = count + 1
+           
+          new_embed = new_embed:add(context[{{1}, {subword_idx}, {}}])
+
+          if (curr_subword:sub(#curr_subword-1, #curr_subword)) ~= "@@" then
+              
+            print (new_word)
+            print (count)
+            new_classifier_input_all[{{1},{total_words},{}}] = new_embed/count
+            new_word = ""
+            count = 0
+            new_embed:zero()
+            total_words = total_words + 1
+
+          end
+
+        end
+
+          print (total_words-1)
+          print (#labels)
+          assert(#labels == total_words-1)
+    end
+        -- label size equal to source_words
+
+    classifier_input_all = new_classifier_input_all
+
+
+
     -- forward classifier    
     local pred_labels = {}
     for t = 1, classifier_input_all:size(2) do
