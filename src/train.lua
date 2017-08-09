@@ -509,11 +509,10 @@ function train(train_data, epoch)
 
           print (total_words-1)
           print (#batch_labels[j])
-          assert(#batch_labels[j] == total_words-1)
+          assert(#batch_labels[j] == total_words-1) -- label size equal to source_words
+          classifier_input_all = new_classifier_input_all
         end
-        -- label size equal to source_words
-
-        classifier_input_all = new_classifier_input_all
+                
 
         if classifier_opt.verbose then 
           print('classifier_input_all:'); print(classifier_input_all);
@@ -870,14 +869,13 @@ function eval(data, epoch, logger, test_or_val, pred_filename)
 
         end
 
-          print (total_words-1)
-          print (#labels)
-          assert(#labels == total_words-1)
+      print (total_words-1)
+      print (#labels)
+      assert(#labels == total_words-1)  -- label size equal to source_words
+
+      classifier_input_all = new_classifier_input_all
+
     end
-        -- label size equal to source_words
-
-    classifier_input_all = new_classifier_input_all
-
 
 
     -- forward classifier    
