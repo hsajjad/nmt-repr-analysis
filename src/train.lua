@@ -484,10 +484,8 @@ function train(train_data, epoch)
           local total_words = 1
 
           for subword_idx = 1, source_l do
-            print ('SUBWORD', subword_idx)
+      
             local curr_subword = idx2word_src[source[{subword_idx}]] -- convert idx to string
-            print ('CURR', curr_subword)
-
             new_word = new_word .. curr_subword
             count = count + 1
             
@@ -495,8 +493,6 @@ function train(train_data, epoch)
 
             if (curr_subword:sub(#curr_subword-1, #curr_subword)) ~= "@@" then
               
-              print (new_word)
-              print (count)
               new_classifier_input_all[{{1},{total_words},{}}] = new_embed/count
               new_word = ""
               count = 0
@@ -507,8 +503,6 @@ function train(train_data, epoch)
 
           end
 
-          print (total_words-1)
-          print (#batch_labels[j])
           assert(#batch_labels[j] == total_words-1) -- label size equal to source_words
           classifier_input_all = new_classifier_input_all
         end
@@ -846,10 +840,8 @@ function eval(data, epoch, logger, test_or_val, pred_filename)
         local total_words = 1
 
         for subword_idx = 1, source_l do
-          print ('SUBWORD', subword_idx)
+      
           local curr_subword = idx2word_src[source[{subword_idx}]] -- convert idx to string
-          print ('CURR', curr_subword)
-
           new_word = new_word .. curr_subword
           count = count + 1
            
@@ -857,8 +849,6 @@ function eval(data, epoch, logger, test_or_val, pred_filename)
 
           if (curr_subword:sub(#curr_subword-1, #curr_subword)) ~= "@@" then
               
-            print (new_word)
-            print (count)
             new_classifier_input_all[{{1},{total_words},{}}] = new_embed/count
             new_word = ""
             count = 0
@@ -869,8 +859,7 @@ function eval(data, epoch, logger, test_or_val, pred_filename)
 
         end
 
-      print (total_words-1)
-      print (#labels)
+      
       assert(#labels == total_words-1)  -- label size equal to source_words
 
       classifier_input_all = new_classifier_input_all
