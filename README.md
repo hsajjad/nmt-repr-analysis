@@ -21,6 +21,10 @@ Run `th src/train.lua` with the following mandatory arguments:
 * `cl_save`: Path to folder where experiment will be saved
 * `cl_pred_file`: Prefix to save prediction files (should be base name, not full path)
 
+Option arguments in case model is trained using BPE:
+* `cl_bpe`: Flag for BPE. Word features consists of an average of its' subword units
+* `cl_lsw`: Instead of average, take the last subword unit's vector as feature
+
 Files with labels and sentences (`cl_train/val/test_lbl/source_file`) should have one sentence per line.
 
 For more options, see `src/s2sa/beam.lua`
