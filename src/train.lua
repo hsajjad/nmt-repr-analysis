@@ -486,10 +486,19 @@ function train(train_data, epoch)
           for subword_idx = 1, source_l do
       
             local curr_subword = idx2word_src[source[{subword_idx}]] -- convert idx to string
-            new_word = new_word .. curr_subword
-            count = count + 1
-            
-            new_embed = new_embed:add(context[{{1}, {subword_idx}, {}}])
+            if classifier_opt.lsw then -- if lsw is on, then take only Last Sub Word instead of aggregating embedding of all subword units
+
+              new_embed = context[{{1}, {subword_idx}, {}}] -- take the embedding of the last subword
+              count = 1
+
+            else
+
+              new_word = new_word .. curr_subword
+              count = count + 1
+              new_embed = new_embed:add(context[{{1}, {subword_idx}, {}}])    -- aggregating embeddings          
+            end
+
+            --new_embed = new_embed:add(context[{{1}, {subword_idx}, {}}])
 
             if (curr_subword:sub(#curr_subword-1, #curr_subword)) ~= "@@" then
               

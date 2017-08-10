@@ -89,6 +89,7 @@ cmd:option('-cl_linear_classifier', false, 'Whether to use a linear classifier')
 cmd:option('-cl_verbose', false, 'Print a lot of information')
 -- training of model is done using bpe
 cmd:option('-cl_bpe', false, 'Whether model is trained with BPE sub-word units or not')
+cmd:option('-cl_lsw', false, 'take embedding of lass subword unit. Default is aggregate embeddigns of sub-word units')
 
 function copy(orig)
   local orig_type = type(orig)
