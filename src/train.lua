@@ -488,7 +488,7 @@ function train(train_data, epoch)
             local curr_subword = idx2word_src[source[{subword_idx}]] -- convert idx to string
             if classifier_opt.lsw then -- if lsw is on, then take only Last Sub Word instead of aggregating embedding of all subword units
 
-              new_embed = context[{{1}, {subword_idx}, {}}] -- take the embedding of the last subword
+              new_embed = context[{{1}, {subword_idx}, {}}]:clone()  -- take the embedding of the last subword
               count = 1
 
             else
